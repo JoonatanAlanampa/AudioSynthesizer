@@ -12,7 +12,7 @@ https://github.com/user-attachments/assets/6c46307f-5855-40c4-97d4-067e06dfc58d
 
 ## Setup
 
-- Software requirements: Project can be setup using Vivado
-- Hardware requirements: PYNQ-Z1 development board, DA7212 audio codec shield and speakers
+- Software requirements: Project can be setup using Vivado.
+- Hardware requirements: PYNQ-Z1 development board, DA7212 audio codec shield and speakers.
 
 - In addition to provided source and constaint files, premade PLL block should be used in Vivado while putting it all together. I2C block operates with 50MHz clock but the synthesizer itself operates with 12MHz clock.
