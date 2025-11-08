@@ -52,8 +52,7 @@ architecture rtl of i2c_config is
 	constant slave_address_c : std_logic_vector(byte_c-1 downto 0) := "00110100"; -- slave address+write bit
 	constant sclk_level_c    : integer := ref_clk_freq_g / (2*i2c_freq_g); -- How many reference clock cycles there are on 1 sclk logic level
 	
-	-- Essentially these signals just ensure that state transitions at STOP do not violate the specified
-	-- timing constraints.
+	-- Essentially these signals ensure that state transitions at STOP do not violate the specified timing constraints
 
 	constant ticks_per_us_c     : integer := ref_clk_freq_g / 1000000;
 	constant tsu_sto_cycles_c   : integer := 4  * ticks_per_us_c;  
