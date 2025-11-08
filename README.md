@@ -6,6 +6,10 @@ Audio synthesizer project to understand logic synthesis using VHDL. This is a fu
 
 ![Block diagram](docs/images/Synthesizer.png)
 
+
+https://github.com/user-attachments/assets/6c46307f-5855-40c4-97d4-067e06dfc58d
+
+
 ## Setup
 
 - Software requirements: Project can be setup using Vivado
