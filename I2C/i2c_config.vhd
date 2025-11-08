@@ -12,12 +12,12 @@ entity i2c_config is
 		n_leds_g       : integer := 4 -- number of leds
 	);
 	port (
-		clk 			        : in std_logic;
-		rst_n 			      : in std_logic;
-		sdat_inout 		    : inout std_logic; -- other stuff is output to DA7212, ack/nack input to i2c
-		sclk_out 		      : out std_logic; -- generate here, rising edge used for sampling data and falling edge to send data
-		param_status_out  : out std_logic_vector(n_leds_g-1 downto 0); -- debug info, have the 15 params been set?
-		finished_out 	    : out std_logic -- i2c has configured everything (15 transmissions) flag
+		clk 			         : in std_logic;
+		rst_n 			     	 : in std_logic;
+		sdat_inout 		    	 : inout std_logic; -- other stuff is output to DA7212, ack/nack input to i2c
+		sclk_out 		     	 : out std_logic; -- generate here, rising edge used for sampling data and falling edge to send data
+		param_status_out 		 : out std_logic_vector(n_leds_g-1 downto 0); -- debug info, have the 15 params been set?
+		finished_out 	   	 	 : out std_logic -- i2c has configured everything (15 transmissions) flag
 	);
 end i2c_config;
 
@@ -52,7 +52,7 @@ architecture rtl of i2c_config is
 	constant slave_address_c : std_logic_vector(byte_c-1 downto 0) := "00110100"; -- slave address+write bit
 	constant sclk_level_c    : integer := ref_clk_freq_g / (2*i2c_freq_g); -- How many reference clock cycles there are on 1 sclk logic level
 	
-	-- Essentially these signals ensure that state transitions at STOP do not violate the specified timing constraints
+	-- Essentially these constants and signals ensure that state transitions at STOP do not violate the specified timing constraints
 
 	constant ticks_per_us_c     : integer := ref_clk_freq_g / 1000000;
 	constant tsu_sto_cycles_c   : integer := 4  * ticks_per_us_c;  
@@ -69,21 +69,20 @@ architecture rtl of i2c_config is
 	
 	-- Counters
 	
-	signal sclk_cnt_r     : integer; -- Keep track whether sclk level should be switched (level switch if sclk_cnt_r = sclk_level_c)
-	signal register_cnt_r : integer; -- Keep track which register+data pair is being configured, also used to determine whether configuration is done i.e. 15 transmissions have successfully been done
-	signal byte_cnt_r 	  : integer; -- Keep track how many bytes have been sent (3 bytes / transmission)
+	signal sclk_cnt_r       : integer; -- Keep track whether sclk level should be switched (level switch if sclk_cnt_r = sclk_level_c)
+	signal register_cnt_r   : integer; -- Keep track which register+data pair is being configured, also used to determine whether configuration is done i.e. 15 transmissions have successfully been done
+	signal byte_cnt_r 	    : integer; -- Keep track how many bytes have been sent (3 bytes / transmission)
 	signal bit_cnt_r 	    : integer; -- Keep track how many bits have been sent in the DATA state (8 bits / DATA state visit)
 	
 	-- Data storage signals
 	
-	signal sclk_r 	       : std_logic; -- Hold sclk current value, forward to sclk_out
-	signal sclk_prev_r 	   : std_logic; -- Detect sclk falling and rising edges
-	signal sdat_r 	  	   : std_logic; -- Control sdat_inout (i2c_config controls or releases sdat_inout channel) and data that is sent through it with values '0' and 'Z'
+	signal sclk_r 	         : std_logic; -- Hold sclk current value, forward to sclk_out
+	signal sclk_prev_r 	     : std_logic; -- Detect sclk falling and rising edges
+	signal sdat_r 	  	     : std_logic; -- Control sdat_inout (i2c_config controls or releases sdat_inout channel) and data that is sent through it with values '0' and 'Z'
 	signal status_r 	     : unsigned(n_leds_g-1 downto 0); -- Track configuration phase, forward to param_status_out
 	signal shift_r 		     : std_logic_vector(byte_c-1 downto 0); -- Shift register used for 8-bit value transmissions
-	signal finished_out_r  : std_logic; -- Hold information whether configuration is done or not, forward to finished_out
-	signal sdat_inout_en_r : std_logic; -- enable for tri-state
-	signal delay_r         : std_logic; -- delay for STOP state to meet timing constraints
+	signal finished_out_r    : std_logic; -- Hold information whether configuration is done or not, forward to finished_out
+	signal sdat_inout_en_r   : std_logic; -- enable for tri-state
 	
 begin
 
@@ -102,23 +101,21 @@ begin
 			if(rst_n = '0') then
 			
 				current_state_r <= START;
-				sclk_cnt_r 		  <= 0;
-				register_cnt_r 	<= 0;
-				byte_cnt_r 		  <= 0;
-				bit_cnt_r 		  <= 0;
+				sclk_cnt_r 		  	<= 0;
+				register_cnt_r 		<= 0;
+				byte_cnt_r 		  	<= 0;
+				bit_cnt_r 		 	<= 0;
 				sclk_r 			    <= '1';
-				sclk_prev_r 	  <= '1';
+				sclk_prev_r 	  	<= '1';
 				sdat_r 			    <= '0';
-				sdat_inout_en_r <= '0';
-				delay_r 		    <= '0';
+				sdat_inout_en_r 	<= '0';
 				status_r 		    <= (others => '0');
 				shift_r 		    <= (others => '0');
-				finished_out_r 	<= '0';
-
-				sto_cnt_r  <= 0;
-				buf_cnt_r  <= 0;
-				hold_sto_r <= '0';
-				wait_buf_r <= '0';
+				finished_out_r 		<= '0';
+				sto_cnt_r  			<= 0;
+				buf_cnt_r  			<= 0;
+				hold_sto_r 			<= '0';
+				wait_buf_r 			<= '0';
 				
 			elsif(clk'event and clk = '1') then
 				case current_state_r is
